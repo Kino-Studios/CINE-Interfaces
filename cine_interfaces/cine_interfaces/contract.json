@@ -1,0 +1,469 @@
+{
+  "contract_version": 1,
+  "streams": [
+    {
+      "key": "camera_image",
+      "description": "Greyscale camera frames from the Pi; VINS reads them on the Pi and the depth model on the ground.",
+      "message_type": "sensor_msgs/msg/Image",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": true,
+      "publishers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "camera_publisher",
+          "topic": "/camera/image_raw",
+          "source": {
+            "kind": "config",
+            "file": "cine_sensing_config/config/camera.json",
+            "key": [
+              "camera_publisher",
+              "ros__parameters",
+              "camera_topic"
+            ]
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "depth_publisher_node",
+          "topic": "/camera/image_raw",
+          "source": {
+            "kind": "code",
+            "file": "cine_depth/cine_depth/depth_publisher_node.py"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "cinematic_intent_node",
+          "topic": "/camera_publisher/image_raw",
+          "source": {
+            "kind": "config",
+            "file": "cine_config/config/topics/topic-params.json",
+            "key": [
+              "topics",
+              "image_topic"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "key": "camera_info",
+      "description": "Camera intrinsics for the orbit node. camera.json names the topic, but no CINE-Sensing node publishes it yet.",
+      "message_type": "sensor_msgs/msg/CameraInfo",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": true,
+      "publishers": [],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "orbit_waypoint_generator",
+          "topic": "/camera/camera_info",
+          "source": {
+            "kind": "code",
+            "file": "cine_agent/cine_agent/setpoint_adjustment/nodes/orbit_waypoint_generator_node.py"
+          }
+        }
+      ]
+    },
+    {
+      "key": "subject_center",
+      "description": "Centre of the detected subject, in image pixels.",
+      "message_type": "geometry_msgs/msg/PolygonStamped",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": false,
+      "publishers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "bb_extractor",
+          "topic": "/object_detection/center_point",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_yolo/cine_sensing_yolo/bb_extractor.py"
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "cost_function_calculator",
+          "topic": "/object_detection/center_point",
+          "source": {
+            "kind": "launch",
+            "file": "cine_bringup/launch/cinematic_run.launch.py",
+            "executable": "cost_function_calculator",
+            "parameter": "center_topic"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "cinematic_intent_node",
+          "topic": "/object_detection/center_point",
+          "source": {
+            "kind": "launch",
+            "file": "cine_bringup/launch/cinematic_run.launch.py",
+            "executable": "cinematographic_adjustment_node",
+            "parameter": "center_topic"
+          }
+        }
+      ]
+    },
+    {
+      "key": "subject_box",
+      "description": "Oriented bounding box of the detected subject, in image pixels.",
+      "message_type": "geometry_msgs/msg/PolygonStamped",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": false,
+      "publishers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "bb_extractor",
+          "topic": "/object_detection/bounding_box",
+          "source": {
+            "kind": "config",
+            "file": "cine_sensing_config/config/user_params.json",
+            "key": [
+              "ModelDetectionConstants",
+              "BOUNDING_BOX_TOPIC"
+            ]
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "cost_function_calculator",
+          "topic": "/object_detection/bounding_box",
+          "source": {
+            "kind": "launch",
+            "file": "cine_bringup/launch/cinematic_run.launch.py",
+            "executable": "cost_function_calculator",
+            "parameter": "bbox_topic"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "cinematic_intent_node",
+          "topic": "/object_detection/bounding_box",
+          "source": {
+            "kind": "launch",
+            "file": "cine_bringup/launch/cinematic_run.launch.py",
+            "executable": "cinematographic_adjustment_node",
+            "parameter": "bbox_topic"
+          }
+        }
+      ]
+    },
+    {
+      "key": "subject_size",
+      "description": "Width and height of the detected subject, in image pixels.",
+      "message_type": "geometry_msgs/msg/PolygonStamped",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": false,
+      "publishers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "bb_extractor",
+          "topic": "/object_detection/dimensions",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_yolo/cine_sensing_yolo/bb_extractor.py"
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "cost_function_calculator",
+          "topic": "/object_detection/dimensions",
+          "source": {
+            "kind": "launch",
+            "file": "cine_bringup/launch/cinematic_run.launch.py",
+            "executable": "cost_function_calculator",
+            "parameter": "dimensions_topic"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "cinematic_intent_node",
+          "topic": "/object_detection/dimensions",
+          "source": {
+            "kind": "launch",
+            "file": "cine_bringup/launch/cinematic_run.launch.py",
+            "executable": "cinematographic_adjustment_node",
+            "parameter": "dimensions_topic"
+          }
+        }
+      ]
+    },
+    {
+      "key": "position_estimate",
+      "description": "VIO odometry relayed from VINS. The ground side listens on other names today; the planner-to-drone path has never been connected.",
+      "message_type": "nav_msgs/msg/Odometry",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": true,
+      "publishers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "vio_publisher",
+          "topic": "/vio/odometry",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_imu/cine_sensing_imu/vio_publisher.py"
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "cinematic_intent_node",
+          "topic": "/drone_0_visual_slam/odom",
+          "source": {
+            "kind": "unchecked",
+            "reason": "computed in cinematic_run.launch.py as '/drone_' + drone_id + '_' + odom_topic, shown here with the defaults drone_id 0 and odom_topic visual_slam/odom"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "ego_planner_node",
+          "topic": "/drone_0_visual_slam/odom",
+          "source": {
+            "kind": "unchecked",
+            "reason": "C++ subscription in third_party EGO-Planner (ego_replan_fsm.cpp), topic passed through advanced_param.launch.py; computed in cinematic_run.launch.py as '/drone_' + drone_id + '_' + odom_topic, shown here with the defaults drone_id 0 and odom_topic visual_slam/odom"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "light_vector_analysis",
+          "topic": "/odom_world",
+          "source": {
+            "kind": "config",
+            "file": "cine_config/config/topics/topic-params.json",
+            "key": [
+              "topics",
+              "odom_topic"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "key": "position_estimate_imu_rate",
+      "description": "VINS odometry propagated at IMU rate; CINE's hardware-mode cost node reads it.",
+      "message_type": "nav_msgs/msg/Odometry",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": false,
+      "publishers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "vins_estimator",
+          "topic": "/imu_propagate",
+          "source": {
+            "kind": "unchecked",
+            "reason": "C++ publisher in third_party/vins_fusion (vins/src/utility/visualization.cpp)"
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "cost_function_calculator",
+          "topic": "/imu_propagate",
+          "source": {
+            "kind": "launch",
+            "file": "cine_bringup/launch/cinematic_run.launch.py",
+            "executable": "cost_function_calculator",
+            "parameter": "odom_topic"
+          }
+        }
+      ]
+    },
+    {
+      "key": "position_pose",
+      "description": "VIO pose for the orbit node.",
+      "message_type": "geometry_msgs/msg/PoseStamped",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": false,
+      "publishers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "vio_publisher",
+          "topic": "/vio/pose",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_imu/cine_sensing_imu/vio_publisher.py"
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "orbit_waypoint_generator",
+          "topic": "/vio/pose",
+          "source": {
+            "kind": "code",
+            "file": "cine_agent/cine_agent/setpoint_adjustment/nodes/orbit_waypoint_generator_node.py"
+          }
+        }
+      ]
+    },
+    {
+      "key": "depth_image",
+      "description": "Depth Anything output sent back to the Pi. VINS subscribes only when use_depth is 1, and it is 0 in every config today.",
+      "message_type": "sensor_msgs/msg/Image",
+      "direction": "ground_to_pi",
+      "accepted_mismatch": true,
+      "publishers": [
+        {
+          "repository": "CINE",
+          "node": "depth_publisher_node",
+          "topic": "/depth/image_raw",
+          "source": {
+            "kind": "code",
+            "file": "cine_depth/cine_depth/depth_publisher_node.py"
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "vins_estimator",
+          "topic": "/depth_publisher/depth",
+          "source": {
+            "kind": "config",
+            "file": "cine_sensing_config/config/vins.json",
+            "key": [
+              "vins_config",
+              "depth_topic"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "key": "setpoint_translational_position",
+      "description": "Drone position setpoints the Pi relays to MAVROS. Nothing in CINE publishes them yet.",
+      "message_type": "geometry_msgs/msg/PoseStamped",
+      "direction": "ground_to_pi",
+      "accepted_mismatch": true,
+      "publishers": [],
+      "subscribers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "mavros_setpoints",
+          "topic": "/cinematography/translational_position_setpoints",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_setpoint/cine_sensing_setpoint/mavros_setpoints.py"
+          }
+        }
+      ]
+    },
+    {
+      "key": "setpoint_translational_velocity",
+      "description": "Drone velocity setpoints the Pi relays to MAVROS. Nothing in CINE publishes them yet.",
+      "message_type": "geometry_msgs/msg/TwistStamped",
+      "direction": "ground_to_pi",
+      "accepted_mismatch": true,
+      "publishers": [],
+      "subscribers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "mavros_setpoints",
+          "topic": "/cinematography/translational_velocity_setpoints",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_setpoint/cine_sensing_setpoint/mavros_setpoints.py"
+          }
+        }
+      ]
+    },
+    {
+      "key": "setpoint_translational_acceleration",
+      "description": "Drone acceleration setpoints the Pi relays to MAVROS. Nothing in CINE publishes them yet.",
+      "message_type": "geometry_msgs/msg/Vector3Stamped",
+      "direction": "ground_to_pi",
+      "accepted_mismatch": true,
+      "publishers": [],
+      "subscribers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "mavros_setpoints",
+          "topic": "/cinematography/translational_acceleration_setpoints",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_setpoint/cine_sensing_setpoint/mavros_setpoints.py"
+          }
+        }
+      ]
+    },
+    {
+      "key": "setpoint_attitude_position",
+      "description": "Drone attitude setpoints the Pi relays to MAVROS. Nothing in CINE publishes them yet.",
+      "message_type": "geometry_msgs/msg/PoseStamped",
+      "direction": "ground_to_pi",
+      "accepted_mismatch": true,
+      "publishers": [],
+      "subscribers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "mavros_setpoints",
+          "topic": "/cinematography/attitude_position_setpoints",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_setpoint/cine_sensing_setpoint/mavros_setpoints.py"
+          }
+        }
+      ]
+    },
+    {
+      "key": "setpoint_attitude_velocity",
+      "description": "Drone attitude rate setpoints the Pi relays to MAVROS. Nothing in CINE publishes them yet.",
+      "message_type": "geometry_msgs/msg/TwistStamped",
+      "direction": "ground_to_pi",
+      "accepted_mismatch": true,
+      "publishers": [],
+      "subscribers": [
+        {
+          "repository": "CINE-Sensing",
+          "node": "mavros_setpoints",
+          "topic": "/cinematography/attitude_velocity_setpoints",
+          "source": {
+            "kind": "code",
+            "file": "cine_sensing_setpoint/cine_sensing_setpoint/mavros_setpoints.py"
+          }
+        }
+      ]
+    },
+    {
+      "key": "mavros_raw_setpoint",
+      "description": "Position targets the orbit node sends straight to MAVROS, bypassing the setpoint relay.",
+      "message_type": "mavros_msgs/msg/PositionTarget",
+      "direction": "ground_to_pi",
+      "accepted_mismatch": false,
+      "publishers": [
+        {
+          "repository": "CINE",
+          "node": "orbit_waypoint_generator",
+          "topic": "/mavros/setpoint_raw/local",
+          "source": {
+            "kind": "code",
+            "file": "cine_agent/cine_agent/setpoint_adjustment/nodes/orbit_waypoint_generator_node.py"
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "external",
+          "node": "mavros",
+          "topic": "/mavros/setpoint_raw/local",
+          "source": {
+            "kind": "unchecked",
+            "reason": "MAVROS runs on the Pi but belongs to neither repository"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: pre-commit/action@v3.0.1
+
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: pip install pytest
+      # The contract loader and both checks are standard library only; the test that
+      # needs a running ROS graph skips here and runs in the build job.
+      - run: pytest
+
+  build:
+    runs-on: ubuntu-24.04
+    container: ubuntu:noble
+    env:
+      PIP_BREAK_SYSTEM_PACKAGES: '1'
+    steps:
+      - uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: jazzy
+      - uses: actions/checkout@v7
+      - uses: ros-tooling/action-ros-ci@v0.4
+        with:
+          target-ros2-distro: jazzy
+          package-name: cine_interfaces

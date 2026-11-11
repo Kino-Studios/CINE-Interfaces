@@ -1,0 +1,22 @@
+line-length = 100
+target-version = "py312"
+
+extend-exclude = [
+    "third_party",
+    "venv",
+    ".venv",
+    "install",
+    "build",
+    "log",
+]
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "COM812"]
+ignore = [
+    "E501",   # line length handled by formatter
+    "F841",   # local variable assigned but never used: plot handles kept for API symmetry
+    "E741",   # ambiguous variable name: tolerate single-letter loop vars in viz scripts
+]
+
+[format]
+quote-style = "single"

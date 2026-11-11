@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+testpaths = ["cine_interfaces/test"]
+pythonpath = ["cine_interfaces"]
+addopts = "-p no:cacheprovider"

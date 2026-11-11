@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using the metadata from this file.
+title: 'CINE-Interfaces: the ROS 2 topic contract between CINE-Sensing and CINE'
+type: software
+authors:
+  - family-names: Kosukhin
+    given-names: Daniel
+    alias: fishnos
+    website: https://github.com/fishnos
+license: GPL-3.0-only
+repository-code: https://github.com/Kino-Studios/CINE-Interfaces
+version: 0.1.0
