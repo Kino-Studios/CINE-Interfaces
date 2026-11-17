@@ -14,6 +14,8 @@ from pathlib import Path
 SUPPORTED_CONTRACT_VERSION = 1
 REPOSITORIES = ('CINE-Sensing', 'CINE', 'external')
 DIRECTIONS = ('pi_to_ground', 'ground_to_pi')
+# hardware is the real drone; sim is the Gazebo simulator with its default navigation.
+MODES = ('hardware', 'sim')
 
 _STREAM_KEY_PATTERN = re.compile(r'^[a-z][a-z0-9_]*$')
 _MESSAGE_TYPE_PATTERN = re.compile(r'^[a-z][a-z0-9_]*/msg/[A-Z][A-Za-z0-9]*$')
@@ -26,6 +28,7 @@ _STREAM_FIELDS = {
     'message_type',
     'direction',
     'accepted_mismatch',
+    'modes',
     'publishers',
     'subscribers',
 }
@@ -67,6 +70,7 @@ class Stream:
     message_type: str
     direction: str
     accepted_mismatch: bool
+    modes: tuple[str, ...]
     publishers: tuple[Endpoint, ...]
     subscribers: tuple[Endpoint, ...]
 
@@ -204,6 +208,16 @@ def _parse_stream(document, index: int) -> Stream:
     if not isinstance(document['accepted_mismatch'], bool):
         raise ContractError(f'{where}: accepted_mismatch must be true or false')
 
+    modes = document['modes']
+    if not isinstance(modes, list) or not modes:
+        raise ContractError(f'{where}: modes must be a non-empty list')
+
+    unknown_modes = [mode for mode in modes if mode not in MODES]
+    if unknown_modes:
+        raise ContractError(
+            f'{where}: mode(s) {unknown_modes!r} not among {", ".join(MODES)}',
+        )
+
     endpoints_by_role = {}
 
     for role in ('publishers', 'subscribers'):
@@ -221,6 +235,7 @@ def _parse_stream(document, index: int) -> Stream:
         message_type=message_type,
         direction=document['direction'],
         accepted_mismatch=document['accepted_mismatch'],
+        modes=tuple(mode for mode in MODES if mode in modes),
         publishers=endpoints_by_role['publishers'],
         subscribers=endpoints_by_role['subscribers'],
     )

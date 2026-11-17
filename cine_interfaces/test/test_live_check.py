@@ -15,7 +15,11 @@ from cine_interfaces.live_check import (
 FIXTURE_TEXT = (Path(__file__).parent / 'fixtures' / 'topic_info_odometry.txt').read_text()
 
 
-def _contract(accepted_mismatch=False, message_type='nav_msgs/msg/Odometry'):
+def _contract(
+    accepted_mismatch=False,
+    message_type='nav_msgs/msg/Odometry',
+    modes=('hardware',),
+):
     return parse(
         {
             'contract_version': 1,
@@ -26,6 +30,7 @@ def _contract(accepted_mismatch=False, message_type='nav_msgs/msg/Odometry'):
                     'message_type': message_type,
                     'direction': 'pi_to_ground',
                     'accepted_mismatch': accepted_mismatch,
+                    'modes': list(modes),
                     'publishers': [
                         {
                             'repository': 'CINE-Sensing',
@@ -173,6 +178,7 @@ def _split_topic_contract(accepted_mismatch=False):
                     'message_type': 'nav_msgs/msg/Odometry',
                     'direction': 'pi_to_ground',
                     'accepted_mismatch': accepted_mismatch,
+                    'modes': ['hardware'],
                     'publishers': [
                         {
                             'repository': 'CINE-Sensing',
@@ -224,3 +230,23 @@ def test_unpublished_subscriber_of_accepted_stream_is_info_when_not_strict():
 
     assert _errors(findings) == []
     assert len(findings) == 1
+
+
+def test_live_check_skips_a_stream_outside_the_chosen_mode():
+    findings = check_live(_contract(modes=('hardware',)), topic_info=lambda topic: None, mode='sim')
+
+    assert findings == []
+
+
+def test_live_check_reports_a_stream_in_the_chosen_mode():
+    contract = _contract(modes=('hardware', 'sim'))
+
+    errors = _errors(check_live(contract, topic_info=lambda topic: None, mode='sim'))
+
+    assert errors
+
+
+def test_live_check_defaults_to_the_hardware_mode():
+    findings = check_live(_contract(modes=('sim',)), topic_info=lambda topic: None)
+
+    assert findings == []

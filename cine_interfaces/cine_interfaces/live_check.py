@@ -79,11 +79,15 @@ def check_live(
     contract: Contract,
     topic_info: Callable[[str], str | None] = ros2_topic_info,
     strict: bool = False,
+    mode: str = 'hardware',
 ) -> list[Finding]:
     endpoints_by_topic = {}
     findings = []
 
     for stream in contract.streams:
+        if mode not in stream.modes:
+            continue
+
         for role, endpoints in (
             ('publisher', stream.publishers),
             ('subscriber', stream.subscribers),

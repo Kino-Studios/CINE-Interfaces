@@ -31,6 +31,14 @@ There are four kinds of source:
 
 An unchecked endpoint is reported as information on every run, so the gap stays visible.
 
+### Simulator and hardware streams
+
+Each stream lists the modes it belongs to in `modes`: `hardware` for the real drone,
+`sim` for the Gazebo simulator with its default navigation, or both. The live check
+only looks at the streams of the mode it is asked for, so a topic that exists in one
+setting only does not fail the other. The repository check reads every stream in
+either mode, since the code for both lives in the same checkout.
+
 ### Accepted mismatches
 
 Some streams do not line up today: the two sides use different topic names, or one side
@@ -71,6 +79,7 @@ Check a running ROS 2 graph (needs a sourced ROS 2 setup, so `ros2` is on the pa
 ```bash
 python3 -m cine_interfaces.check --live
 python3 -m cine_interfaces.check --live --strict   # accepted mismatches become errors
+python3 -m cine_interfaces.check --live --mode sim # the Gazebo simulator's streams
 ```
 
 Both commands print one line per finding and a count. `--json` prints a single JSON

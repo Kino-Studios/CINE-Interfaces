@@ -1,7 +1,7 @@
 """Check a repository, or a running ROS 2 graph, against the topic contract.
 
     python3 -m cine_interfaces.check REPOSITORY ROOT [--contract PATH] [--json]
-    python3 -m cine_interfaces.check --live [--strict] [--contract PATH] [--json]
+    python3 -m cine_interfaces.check --live [--mode hardware|sim] [--strict] [--contract PATH] [--json]
 
 Exit codes: 0 no errors, 1 at least one error finding, 2 the check could not run.
 """
@@ -14,7 +14,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from cine_interfaces import live_check
-from cine_interfaces.contract import REPOSITORIES, ContractError, load
+from cine_interfaces.contract import MODES, REPOSITORIES, ContractError, load
 from cine_interfaces.static_check import check_repository
 
 EXIT_OK = 0
@@ -46,6 +46,13 @@ def _build_parser() -> argparse.ArgumentParser:
         '--strict',
         action='store_true',
         help='with --live, report accepted mismatches as errors too',
+    )
+    parser.add_argument(
+        '--mode',
+        choices=MODES,
+        default='hardware',
+        help='with --live, check the streams of the real drone (hardware, the default) '
+        'or of the Gazebo simulator (sim)',
     )
     parser.add_argument('--contract', type=Path, help='contract file (default: the packaged one)')
     parser.add_argument('--json', action='store_true', help='print one JSON report on stdout')
@@ -118,6 +125,7 @@ def main(argv: list[str] | None = None) -> int:
                 contract,
                 topic_info=live_check.ros2_topic_info,
                 strict=arguments.strict,
+                mode=arguments.mode,
             )
         except FileNotFoundError:
             print('error: ros2 not found on PATH; source a ROS 2 setup first', file=sys.stderr)

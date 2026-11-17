@@ -6,7 +6,11 @@
       "description": "Greyscale camera frames from the Pi; VINS reads them on the Pi and the depth model on the ground.",
       "message_type": "sensor_msgs/msg/Image",
       "direction": "pi_to_ground",
-      "accepted_mismatch": true,
+      "accepted_mismatch": false,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -36,7 +40,7 @@
         {
           "repository": "CINE",
           "node": "cinematic_intent_node",
-          "topic": "/camera_publisher/image_raw",
+          "topic": "/camera/image_raw",
           "source": {
             "kind": "config",
             "file": "cine_config/config/topics/topic-params.json",
@@ -54,6 +58,9 @@
       "message_type": "sensor_msgs/msg/CameraInfo",
       "direction": "pi_to_ground",
       "accepted_mismatch": true,
+      "modes": [
+        "hardware"
+      ],
       "publishers": [],
       "subscribers": [
         {
@@ -73,6 +80,10 @@
       "message_type": "geometry_msgs/msg/PolygonStamped",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -115,6 +126,10 @@
       "message_type": "geometry_msgs/msg/PolygonStamped",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -161,6 +176,10 @@
       "message_type": "geometry_msgs/msg/PolygonStamped",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -199,10 +218,13 @@
     },
     {
       "key": "position_estimate",
-      "description": "VIO odometry relayed from VINS. The ground side listens on other names today; the planner-to-drone path has never been connected.",
+      "description": "VIO odometry relayed from VINS. The ground side reads it under the same name, /vio/odometry.",
       "message_type": "nav_msgs/msg/Odometry",
       "direction": "pi_to_ground",
-      "accepted_mismatch": true,
+      "accepted_mismatch": false,
+      "modes": [
+        "hardware"
+      ],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -218,25 +240,25 @@
         {
           "repository": "CINE",
           "node": "cinematic_intent_node",
-          "topic": "/drone_0_visual_slam/odom",
+          "topic": "/vio/odometry",
           "source": {
             "kind": "unchecked",
-            "reason": "computed in cinematic_run.launch.py as '/drone_' + drone_id + '_' + odom_topic, shown here with the defaults drone_id 0 and odom_topic visual_slam/odom"
+            "reason": "passed as the odometry_topic launch argument of cinematic_run.launch.py, default /vio/odometry when use_simulation is false"
           }
         },
         {
           "repository": "CINE",
           "node": "ego_planner_node",
-          "topic": "/drone_0_visual_slam/odom",
+          "topic": "/vio/odometry",
           "source": {
             "kind": "unchecked",
-            "reason": "C++ subscription in third_party EGO-Planner (ego_replan_fsm.cpp), topic passed through advanced_param.launch.py; computed in cinematic_run.launch.py as '/drone_' + drone_id + '_' + odom_topic, shown here with the defaults drone_id 0 and odom_topic visual_slam/odom"
+            "reason": "C++ subscription in third_party EGO-Planner (ego_replan_fsm.cpp), topic passed through advanced_param.launch.py; passed as the odometry_topic launch argument of cinematic_run.launch.py, default /vio/odometry when use_simulation is false"
           }
         },
         {
           "repository": "CINE",
           "node": "light_vector_analysis",
-          "topic": "/odom_world",
+          "topic": "/vio/odometry",
           "source": {
             "kind": "config",
             "file": "cine_config/config/topics/topic-params.json",
@@ -249,11 +271,65 @@
       ]
     },
     {
+      "key": "simulated_position_estimate",
+      "description": "Odometry from the simulated flight controller. In Gazebo with nav_source sim, the default, the ground side flies on it in place of position_estimate.",
+      "message_type": "nav_msgs/msg/Odometry",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": false,
+      "modes": [
+        "sim"
+      ],
+      "publishers": [
+        {
+          "repository": "external",
+          "node": "mavros",
+          "topic": "/mavros/local_position/odom",
+          "source": {
+            "kind": "unchecked",
+            "reason": "MAVROS publishes the flight controller's local position estimate"
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "cinematic_intent_node",
+          "topic": "/mavros/local_position/odom",
+          "source": {
+            "kind": "unchecked",
+            "reason": "passed as the odometry_topic launch argument by cine_gazebo/launch/gazebo_sim.launch.py, which picks /mavros/local_position/odom when nav_source is sim"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "ego_planner_node",
+          "topic": "/mavros/local_position/odom",
+          "source": {
+            "kind": "unchecked",
+            "reason": "passed as the odometry_topic launch argument by cine_gazebo/launch/gazebo_sim.launch.py, which picks /mavros/local_position/odom when nav_source is sim"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "camera_pose_publisher",
+          "topic": "/mavros/local_position/odom",
+          "source": {
+            "kind": "unchecked",
+            "reason": "passed as the odometry_topic launch argument by cine_gazebo/launch/gazebo_sim.launch.py, which picks /mavros/local_position/odom when nav_source is sim"
+          }
+        }
+      ]
+    },
+    {
       "key": "position_estimate_imu_rate",
       "description": "VINS odometry propagated at IMU rate; CINE's hardware-mode cost node reads it.",
       "message_type": "nav_msgs/msg/Odometry",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -285,6 +361,9 @@
       "message_type": "geometry_msgs/msg/PoseStamped",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
+      "modes": [
+        "hardware"
+      ],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -313,7 +392,11 @@
       "description": "Depth Anything output sent back to the Pi. VINS subscribes only when use_depth is 1, and it is 0 in every config today.",
       "message_type": "sensor_msgs/msg/Image",
       "direction": "ground_to_pi",
-      "accepted_mismatch": true,
+      "accepted_mismatch": false,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [
         {
           "repository": "CINE",
@@ -329,7 +412,7 @@
         {
           "repository": "CINE-Sensing",
           "node": "vins_estimator",
-          "topic": "/depth_publisher/depth",
+          "topic": "/depth/image_raw",
           "source": {
             "kind": "config",
             "file": "cine_sensing_config/config/vins.json",
@@ -343,11 +426,25 @@
     },
     {
       "key": "setpoint_translational_position",
-      "description": "Drone position setpoints the Pi relays to MAVROS. Nothing in CINE publishes them yet.",
+      "description": "Drone position setpoints the Pi relays to MAVROS. CINE's planner_setpoint_adapter publishes them from the planner's position commands.",
       "message_type": "geometry_msgs/msg/PoseStamped",
       "direction": "ground_to_pi",
-      "accepted_mismatch": true,
-      "publishers": [],
+      "accepted_mismatch": false,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
+      "publishers": [
+        {
+          "repository": "CINE",
+          "node": "planner_setpoint_adapter",
+          "topic": "/cinematography/translational_position_setpoints",
+          "source": {
+            "kind": "code",
+            "file": "cine_agent/cine_agent/setpoint_sender/planner_setpoint_adapter.py"
+          }
+        }
+      ],
       "subscribers": [
         {
           "repository": "CINE-Sensing",
@@ -366,6 +463,10 @@
       "message_type": "geometry_msgs/msg/TwistStamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": true,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [],
       "subscribers": [
         {
@@ -385,6 +486,10 @@
       "message_type": "geometry_msgs/msg/Vector3Stamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": true,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [],
       "subscribers": [
         {
@@ -404,6 +509,10 @@
       "message_type": "geometry_msgs/msg/PoseStamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": true,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [],
       "subscribers": [
         {
@@ -423,6 +532,10 @@
       "message_type": "geometry_msgs/msg/TwistStamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": true,
+      "modes": [
+        "hardware",
+        "sim"
+      ],
       "publishers": [],
       "subscribers": [
         {
@@ -442,6 +555,9 @@
       "message_type": "mavros_msgs/msg/PositionTarget",
       "direction": "ground_to_pi",
       "accepted_mismatch": false,
+      "modes": [
+        "hardware"
+      ],
       "publishers": [
         {
           "repository": "CINE",

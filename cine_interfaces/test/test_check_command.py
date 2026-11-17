@@ -13,6 +13,7 @@ CONTRACT = {
             'message_type': 'geometry_msgs/msg/PoseStamped',
             'direction': 'pi_to_ground',
             'accepted_mismatch': False,
+            'modes': ['hardware'],
             'publishers': [
                 {
                     'repository': 'CINE-Sensing',
@@ -138,3 +139,28 @@ def test_live_with_repository_argument_exits_2(tmp_path):
     )
 
     assert exit_code == 2
+
+
+def test_live_sim_mode_skips_hardware_only_streams(tmp_path, capsys, monkeypatch):
+    contract_path, _ = _setup(tmp_path)
+    monkeypatch.setattr(live_check, 'ros2_topic_info', lambda topic: None)
+
+    exit_code = main(['--live', '--mode', 'sim', '--contract', str(contract_path)])
+
+    assert exit_code == 0
+    assert '0 errors' in capsys.readouterr().out
+
+
+def test_live_defaults_to_hardware_mode(tmp_path, capsys, monkeypatch):
+    contract_path, _ = _setup(tmp_path)
+    monkeypatch.setattr(live_check, 'ros2_topic_info', lambda topic: None)
+
+    exit_code = main(['--live', '--contract', str(contract_path)])
+
+    assert exit_code == 1
+
+
+def test_unknown_mode_exits_2(tmp_path):
+    contract_path, _ = _setup(tmp_path)
+
+    assert main(['--live', '--mode', 'bench', '--contract', str(contract_path)]) == 2

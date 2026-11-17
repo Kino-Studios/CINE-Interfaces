@@ -12,6 +12,7 @@ def _pose_document():
                 'message_type': 'geometry_msgs/msg/PoseStamped',
                 'direction': 'pi_to_ground',
                 'accepted_mismatch': False,
+                'modes': ['hardware'],
                 'publishers': [
                     {
                         'repository': 'CINE-Sensing',
@@ -147,3 +148,33 @@ def test_packaged_contract_loads():
 
     assert isinstance(contract, Contract)
     assert contract.version == 1
+
+
+def test_stream_modes_are_parsed():
+    contract = parse(_pose_document())
+
+    assert contract.stream('position_pose').modes == ('hardware',)
+
+
+def test_stream_without_modes_is_rejected():
+    document = _pose_document()
+    del document['streams'][0]['modes']
+
+    with pytest.raises(ContractError, match='modes'):
+        parse(document)
+
+
+def test_unknown_mode_is_rejected():
+    document = _pose_document()
+    document['streams'][0]['modes'] = ['bench']
+
+    with pytest.raises(ContractError, match='bench'):
+        parse(document)
+
+
+def test_empty_modes_list_is_rejected():
+    document = _pose_document()
+    document['streams'][0]['modes'] = []
+
+    with pytest.raises(ContractError, match='modes'):
+        parse(document)

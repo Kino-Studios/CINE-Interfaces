@@ -11,6 +11,7 @@ def _contract(publisher_source, publisher_topic='/vio/odometry', **stream_overri
         'message_type': 'nav_msgs/msg/Odometry',
         'direction': 'pi_to_ground',
         'accepted_mismatch': False,
+        'modes': ['hardware'],
         'publishers': [
             {
                 'repository': 'CINE-Sensing',
