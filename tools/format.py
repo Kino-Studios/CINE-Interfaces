@@ -77,6 +77,7 @@ def _block_opener(line):
 def _statement_lines(source):
     """Line numbers (1-based) of return/raise statements that are not the first
     statement of their enclosing block, plus the header line of every def/class."""
+
     tree = ast.parse(source)
     returns = set()
     headers = set()
@@ -98,6 +99,7 @@ def _next_indent(lines):
     """For each line index, the leading-space count of the next non-blank line
     (-1 if none follows). Used to tell body-level blank runs from module-level
     gaps, which ruff owns."""
+
     upcoming = -1
     result = [-1] * len(lines)
 
@@ -122,12 +124,10 @@ def _format_source(source):
 
     for number, line in enumerate(lines, start=1):
         prev = out[-1] if out else ''
-
         if number in returns and prev.strip() and not _block_opener(prev):
             out.append('')
 
         is_blank = line.strip() == ''
-
         # Collapse consecutive blanks to one only inside an indented block. A blank
         # run whose next code is at column 0 is a module-level gap — left for ruff,
         # which enforces the standard two blank lines around top-level definitions.
@@ -160,7 +160,6 @@ def main(argv):
         help='write nothing; list files that would change and exit 1 if there are any',
     )
     arguments = parser.parse_args(argv)
-
     if arguments.paths:
         paths = [os.path.abspath(path) for path in arguments.paths]
     else:
@@ -170,6 +169,7 @@ def main(argv):
         _run_ruff(paths)
 
     changed = 0
+
     for path in paths:
         with open(path) as handle:
             original = handle.read()
@@ -179,12 +179,14 @@ def main(argv):
             continue
 
         changed += 1
+
         if arguments.check:
             print(f'would reformat {path}')
             continue
 
         with open(path, 'w') as handle:
             handle.write(formatted)
+
         print(f'formatted {path}')
 
     if arguments.check:

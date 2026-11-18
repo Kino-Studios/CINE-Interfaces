@@ -98,6 +98,7 @@ def _missing_node_problem(graph_endpoints, endpoint, wanted_type, message_type) 
         f'no {wanted_type} of {message_type} on {endpoint.topic} '
         f'for {endpoint.repository}/{endpoint.node}'
     )
+
     if candidates:
         other_nodes = ', '.join(sorted({candidate.node_name for candidate in candidates}))
         problem += f' (found only: {other_nodes})'
@@ -134,6 +135,7 @@ def check_live(
 
                 graph_endpoints = endpoints_by_topic[endpoint.topic]
                 wanted_type = _GRAPH_TYPE_BY_ROLE[role]
+
                 if graph_endpoints is None:
                     problem = f'topic {endpoint.topic} is not in the graph'
                 elif node_problem := _missing_node_problem(

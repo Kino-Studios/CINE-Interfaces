@@ -17,17 +17,17 @@ made it.
 link. A stream has a key such as `position_pose`, a message type, a direction
 (`pi_to_ground` or `ground_to_pi`), and its publishers and subscribers. Each endpoint
 names its repository, its node, its topic, and where that topic name comes from in the
-code (its *source*). The checker reads the name from that source and compares it with
+code (its _source_). The checker reads the name from that source and compares it with
 the contract.
 
 There are four kinds of source:
 
-| Kind | Where the name is read from | Fields |
-| --- | --- | --- |
-| `code` | a `create_publisher` or `create_subscription` call with a string literal topic | `file` |
-| `config` | a key in a JSON config file, plus the same key in any profile under `profiles/*/` | `file`, `key` (list of keys) |
-| `launch` | a parameter in a dict literal passed to `Node(executable=...)` in a launch file | `file`, `executable`, `parameter` |
-| `unchecked` | nowhere: the name is computed, lives in C++, or belongs to neither repository | `reason` |
+| Kind        | Where the name is read from                                                       | Fields                            |
+| ----------- | --------------------------------------------------------------------------------- | --------------------------------- |
+| `code`      | a `create_publisher` or `create_subscription` call with a string literal topic    | `file`                            |
+| `config`    | a key in a JSON config file, plus the same key in any profile under `profiles/*/` | `file`, `key` (list of keys)      |
+| `launch`    | a parameter in a dict literal passed to `Node(executable=...)` in a launch file   | `file`, `executable`, `parameter` |
+| `unchecked` | nowhere: the name is computed, lives in C++, or belongs to neither repository     | `reason`                          |
 
 An unchecked endpoint is reported as information on every run, so the gap stays visible.
 
@@ -96,11 +96,11 @@ Both commands print one line per finding and a count. `--json` prints a single J
 report instead, with `ok`, `errors` and `findings`. `--contract PATH` checks against a
 contract file other than the packaged one.
 
-| Exit code | Meaning |
-| --- | --- |
-| 0 | no errors (information lines may still appear) |
-| 1 | at least one error finding |
-| 2 | the check could not run: bad arguments, unreadable contract, or `ros2` missing |
+| Exit code | Meaning                                                                        |
+| --------- | ------------------------------------------------------------------------------ |
+| 0         | no errors (information lines may still appear)                                 |
+| 1         | at least one error finding                                                     |
+| 2         | the check could not run: bad arguments, unreadable contract, or `ros2` missing |
 
 ## Development
 

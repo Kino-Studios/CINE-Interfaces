@@ -7,10 +7,7 @@
       "message_type": "sensor_msgs/msg/Image",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -19,11 +16,7 @@
           "source": {
             "kind": "config",
             "file": "cine_sensing_config/config/camera.json",
-            "key": [
-              "camera_publisher",
-              "ros__parameters",
-              "camera_topic"
-            ]
+            "key": ["camera_publisher", "ros__parameters", "camera_topic"]
           }
         }
       ],
@@ -44,10 +37,7 @@
           "source": {
             "kind": "config",
             "file": "cine_config/config/topics/topic-params.json",
-            "key": [
-              "topics",
-              "image_topic"
-            ]
+            "key": ["topics", "image_topic"]
           }
         }
       ]
@@ -58,9 +48,7 @@
       "message_type": "sensor_msgs/msg/CameraInfo",
       "direction": "pi_to_ground",
       "accepted_mismatch": true,
-      "modes": [
-        "hardware"
-      ],
+      "modes": ["hardware"],
       "publishers": [],
       "subscribers": [
         {
@@ -80,10 +68,7 @@
       "message_type": "geometry_msgs/msg/PolygonStamped",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -126,10 +111,7 @@
       "message_type": "geometry_msgs/msg/PolygonStamped",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -138,10 +120,7 @@
           "source": {
             "kind": "config",
             "file": "cine_sensing_config/config/user_params.json",
-            "key": [
-              "ModelDetectionConstants",
-              "BOUNDING_BOX_TOPIC"
-            ]
+            "key": ["ModelDetectionConstants", "BOUNDING_BOX_TOPIC"]
           }
         }
       ],
@@ -176,10 +155,7 @@
       "message_type": "geometry_msgs/msg/PolygonStamped",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -222,9 +198,7 @@
       "message_type": "nav_msgs/msg/Odometry",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware"
-      ],
+      "modes": ["hardware"],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -262,10 +236,7 @@
           "source": {
             "kind": "config",
             "file": "cine_config/config/topics/topic-params.json",
-            "key": [
-              "topics",
-              "odom_topic"
-            ]
+            "key": ["topics", "odom_topic"]
           }
         }
       ]
@@ -276,9 +247,7 @@
       "message_type": "nav_msgs/msg/Odometry",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": [
-        "sim"
-      ],
+      "modes": ["sim"],
       "publishers": [
         {
           "repository": "external",
@@ -326,10 +295,7 @@
       "message_type": "nav_msgs/msg/Odometry",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -361,9 +327,7 @@
       "message_type": "geometry_msgs/msg/PoseStamped",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware"
-      ],
+      "modes": ["hardware"],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -393,10 +357,7 @@
       "message_type": "sensor_msgs/msg/Image",
       "direction": "ground_to_pi",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [
         {
           "repository": "CINE",
@@ -416,10 +377,7 @@
           "source": {
             "kind": "config",
             "file": "cine_sensing_config/config/vins.json",
-            "key": [
-              "vins_config",
-              "depth_topic"
-            ]
+            "key": ["vins_config", "depth_topic"]
           }
         }
       ]
@@ -430,10 +388,7 @@
       "message_type": "geometry_msgs/msg/PoseStamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [
         {
           "repository": "CINE",
@@ -463,10 +418,7 @@
       "message_type": "geometry_msgs/msg/TwistStamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": true,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [],
       "subscribers": [
         {
@@ -486,10 +438,7 @@
       "message_type": "geometry_msgs/msg/Vector3Stamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": true,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [],
       "subscribers": [
         {
@@ -509,10 +458,7 @@
       "message_type": "geometry_msgs/msg/PoseStamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": true,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [],
       "subscribers": [
         {
@@ -532,10 +478,7 @@
       "message_type": "geometry_msgs/msg/TwistStamped",
       "direction": "ground_to_pi",
       "accepted_mismatch": true,
-      "modes": [
-        "hardware",
-        "sim"
-      ],
+      "modes": ["hardware", "sim"],
       "publishers": [],
       "subscribers": [
         {
@@ -555,9 +498,7 @@
       "message_type": "mavros_msgs/msg/PositionTarget",
       "direction": "ground_to_pi",
       "accepted_mismatch": false,
-      "modes": [
-        "hardware"
-      ],
+      "modes": ["hardware"],
       "publishers": [
         {
           "repository": "CINE",

@@ -68,6 +68,7 @@ def _usage_error(parser: argparse.ArgumentParser, message: str) -> int:
 
 def _report(findings, as_json: bool) -> int:
     error_count = sum(1 for finding in findings if finding.severity == 'error')
+
     if as_json:
         report = {
             'ok': error_count == 0,
