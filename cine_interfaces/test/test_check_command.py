@@ -164,3 +164,25 @@ def test_unknown_mode_exits_2(tmp_path):
     contract_path, _ = _setup(tmp_path)
 
     assert main(['--live', '--mode', 'bench', '--contract', str(contract_path)]) == 2
+
+
+def test_mode_without_live_exits_2_and_says_so(tmp_path, capsys):
+    contract_path, repository_root = _setup(tmp_path)
+
+    exit_code = main(
+        ['CINE-Sensing', str(repository_root), '--mode', 'sim', '--contract', str(contract_path)],
+    )
+
+    assert exit_code == 2
+    assert '--mode needs --live' in capsys.readouterr().err
+
+
+def test_strict_without_live_exits_2_and_says_so(tmp_path, capsys):
+    contract_path, repository_root = _setup(tmp_path)
+
+    exit_code = main(
+        ['CINE-Sensing', str(repository_root), '--strict', '--contract', str(contract_path)],
+    )
+
+    assert exit_code == 2
+    assert '--strict needs --live' in capsys.readouterr().err

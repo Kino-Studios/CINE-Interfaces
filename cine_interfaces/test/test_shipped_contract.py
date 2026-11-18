@@ -83,10 +83,12 @@ def test_vio_odometry_is_checked_only_on_the_drone():
 
 
 def test_streams_of_the_orbit_node_are_checked_only_on_the_drone():
-    for key in ('camera_info', 'position_pose', 'mavros_raw_setpoint'):
-        assert _stream(key).modes == ('hardware',), key
+    assert _stream('camera_info').modes == ('hardware',)
+    assert _stream('position_pose').modes == ('hardware',)
+    assert _stream('mavros_raw_setpoint').modes == ('hardware',)
 
 
 def test_detection_streams_are_checked_in_both_modes():
-    for key in ('camera_image', 'subject_center', 'depth_image'):
-        assert _stream(key).modes == ('hardware', 'sim'), key
+    assert _stream('camera_image').modes == ('hardware', 'sim')
+    assert _stream('subject_center').modes == ('hardware', 'sim')
+    assert _stream('depth_image').modes == ('hardware', 'sim')

@@ -250,3 +250,41 @@ def test_live_check_defaults_to_the_hardware_mode():
     findings = check_live(_contract(modes=('sim',)), topic_info=lambda topic: None)
 
     assert findings == []
+
+
+def test_subscription_from_another_node_does_not_count_for_the_contract_node():
+    recorder_only = FIXTURE_TEXT.replace('Node name: ego_planner_node', 'Node name: bag_recorder')
+
+    errors = _errors(check_live(_contract(), topic_info=lambda topic: recorder_only))
+
+    assert len(errors) == 1
+    assert 'ego_planner_node' in errors[0].message
+    assert 'bag_recorder' in errors[0].message
+
+
+def test_publisher_from_another_node_does_not_count_for_the_contract_node():
+    other_publisher = FIXTURE_TEXT.replace('Node name: vio_publisher', 'Node name: odometry_relay')
+
+    errors = _errors(check_live(_contract(), topic_info=lambda topic: other_publisher))
+
+    assert len(errors) == 1
+    assert 'vio_publisher' in errors[0].message
+
+
+def test_node_name_with_a_prefix_counts_for_the_contract_node():
+    prefixed = FIXTURE_TEXT.replace(
+        'Node name: ego_planner_node',
+        'Node name: drone_0_ego_planner_node',
+    )
+
+    errors = _errors(check_live(_contract(), topic_info=lambda topic: prefixed))
+
+    assert errors == []
+
+
+def test_node_name_merely_ending_in_the_same_letters_does_not_count():
+    lookalike = FIXTURE_TEXT.replace('Node name: ego_planner_node', 'Node name: myego_planner_node')
+
+    errors = _errors(check_live(_contract(), topic_info=lambda topic: lookalike))
+
+    assert len(errors) == 1

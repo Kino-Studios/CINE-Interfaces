@@ -39,6 +39,10 @@ only looks at the streams of the mode it is asked for, so a topic that exists in
 setting only does not fail the other. The repository check reads every stream in
 either mode, since the code for both lives in the same checkout.
 
+`sim` covers the simulator's default `nav_source:=sim`, where the ground side flies on
+the simulated flight controller's odometry. A run with `nav_source:=vins` flies on VINS
+instead, and its streams are not described by either mode yet.
+
 ### Accepted mismatches
 
 Some streams do not line up today: the two sides use different topic names, or one side
@@ -51,8 +55,9 @@ an error.
 ## Changing a topic that crosses the link
 
 Edit `contract.json` first, in this repository. Then change the code in CINE-Sensing
-and CINE to match, and move each repository's pinned commit of CINE-Interfaces forward.
-A rename made only in one repository fails that repository's drift test.
+and CINE to match. Both repositories' CI checks against this repository's `main`, so
+push the contract change only once both repositories match it. A rename made only in
+one repository fails that repository's drift test.
 
 ## Install
 
@@ -81,6 +86,11 @@ python3 -m cine_interfaces.check --live
 python3 -m cine_interfaces.check --live --strict   # accepted mismatches become errors
 python3 -m cine_interfaces.check --live --mode sim # the Gazebo simulator's streams
 ```
+
+The live check credits an endpoint only to the node the contract names. A node whose
+name adds an underscore-separated prefix, such as `drone_0_ego_planner_node`, still
+counts; a different node on the same topic, such as a bag recorder, does not. `--mode`
+and `--strict` apply only with `--live`.
 
 Both commands print one line per finding and a count. `--json` prints a single JSON
 report instead, with `ok`, `errors` and `findings`. `--contract PATH` checks against a

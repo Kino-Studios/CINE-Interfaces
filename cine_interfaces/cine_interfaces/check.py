@@ -50,7 +50,6 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '--mode',
         choices=MODES,
-        default='hardware',
         help='with --live, check the streams of the real drone (hardware, the default) '
         'or of the Gazebo simulator (sim)',
     )
@@ -98,6 +97,10 @@ def main(argv: list[str] | None = None) -> int:
     if arguments.live:
         if arguments.repository or arguments.root:
             return _usage_error(parser, '--live takes no REPOSITORY or ROOT')
+    elif arguments.mode is not None:
+        return _usage_error(parser, '--mode needs --live; a checkout check covers every mode')
+    elif arguments.strict:
+        return _usage_error(parser, '--strict needs --live')
     else:
         if not arguments.repository or not arguments.root:
             return _usage_error(parser, 'REPOSITORY and ROOT are required without --live')
@@ -125,7 +128,7 @@ def main(argv: list[str] | None = None) -> int:
                 contract,
                 topic_info=live_check.ros2_topic_info,
                 strict=arguments.strict,
-                mode=arguments.mode,
+                mode=arguments.mode or 'hardware',
             )
         except FileNotFoundError:
             print('error: ros2 not found on PATH; source a ROS 2 setup first', file=sys.stderr)
