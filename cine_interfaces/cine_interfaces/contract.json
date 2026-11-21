@@ -7,7 +7,7 @@
       "message_type": "sensor_msgs/msg/Image",
       "direction": "pi_to_ground",
       "accepted_mismatch": false,
-      "modes": ["hardware", "sim"],
+      "modes": ["hardware"],
       "publishers": [
         {
           "repository": "CINE-Sensing",
@@ -17,6 +17,46 @@
             "kind": "config",
             "file": "cine_sensing_config/config/camera.json",
             "key": ["camera_publisher", "ros__parameters", "camera_topic"]
+          }
+        }
+      ],
+      "subscribers": [
+        {
+          "repository": "CINE",
+          "node": "depth_publisher_node",
+          "topic": "/camera/image_raw",
+          "source": {
+            "kind": "code",
+            "file": "cine_depth/cine_depth/depth_publisher_node.py"
+          }
+        },
+        {
+          "repository": "CINE",
+          "node": "cinematic_intent_node",
+          "topic": "/camera/image_raw",
+          "source": {
+            "kind": "config",
+            "file": "cine_config/config/topics/topic-params.json",
+            "key": ["topics", "image_topic"]
+          }
+        }
+      ]
+    },
+    {
+      "key": "simulated_camera_image",
+      "description": "Camera frames rendered by Gazebo. In the simulator they stand in for camera_image, on the same topic, and feed the same ground-side readers.",
+      "message_type": "sensor_msgs/msg/Image",
+      "direction": "pi_to_ground",
+      "accepted_mismatch": false,
+      "modes": ["sim"],
+      "publishers": [
+        {
+          "repository": "CINE",
+          "node": "camera_image_bridge",
+          "topic": "/camera/image_raw",
+          "source": {
+            "kind": "unchecked",
+            "reason": "ros_gz_image image_bridge started by cine_gazebo/launch/gazebo_sim.launch.py, which passes the topic as an argument built from CAMERA_TOPIC in cine_gazebo/cine_gazebo/model_rendering.py"
           }
         }
       ],

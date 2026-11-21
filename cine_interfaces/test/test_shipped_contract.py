@@ -25,6 +25,7 @@ def test_shipped_contract_has_every_designed_stream():
         'setpoint_attitude_velocity',
         'mavros_raw_setpoint',
         'simulated_position_estimate',
+        'simulated_camera_image',
     }
 
 
@@ -78,6 +79,18 @@ def test_simulator_flight_controller_odometry_is_checked_only_in_sim():
     assert stream.topic_names == {'/mavros/local_position/odom'}
 
 
+def test_simulator_camera_is_checked_only_in_sim():
+    stream = _stream('simulated_camera_image')
+    publishers = [(p.repository, p.node, p.topic) for p in stream.publishers]
+
+    assert stream.modes == ('sim',)
+    assert publishers == [('CINE', 'camera_image_bridge', '/camera/image_raw')]
+
+
+def test_pi_camera_is_checked_only_on_the_drone():
+    assert _stream('camera_image').modes == ('hardware',)
+
+
 def test_vio_odometry_is_checked_only_on_the_drone():
     assert _stream('position_estimate').modes == ('hardware',)
 
@@ -89,6 +102,5 @@ def test_streams_of_the_orbit_node_are_checked_only_on_the_drone():
 
 
 def test_detection_streams_are_checked_in_both_modes():
-    assert _stream('camera_image').modes == ('hardware', 'sim')
     assert _stream('subject_center').modes == ('hardware', 'sim')
     assert _stream('depth_image').modes == ('hardware', 'sim')
